@@ -146,6 +146,149 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2021/12/27/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/27/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/" class="post-title-link" itemprop="url">两周小总结20211220-20211231</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-27 21:01:47" itemprop="dateCreated datePublished" datetime="2021-12-27T21:01:47+08:00">2021-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-01-02 00:43:40" itemprop="dateModified" datetime="2022-01-02T00:43:40+08:00">2022-01-02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>前言：这两周基本上都没有做开发的事情，所以没怎么遇到开发的问题，但闲的时候有浏览一下技术类的小文章，看到了比较有趣的算法题及其思路；写这篇小总结的时候已经是2022年的元旦了，年终总结还没写，唉；不过新的一年，给自己送的新年礼物是Linux系统，导致1号凌晨4点才睡….</p>
+<p><strong>一、算法题</strong></p>
+<p>问题：你有2颗鸡蛋，需要以最少的尝试次数来判断在100层的高楼上，哪一层楼是鸡蛋的安全层（低于该层鸡蛋不会摔碎，高于该层都会摔碎），假设没有摔碎的鸡蛋可以重复使用，每颗鸡蛋的坚硬程度都是相同的。</p>
+<p><em>1、初始思路</em></p>
+<p>从低往高一层一层试，这应该是最简单的思路；当然，耗时也很多，浪费一颗鸡蛋。</p>
+<ul>
+<li><p>最好情况：1次</p>
+</li>
+<li><p>最坏情况：100次</p>
+</li>
+</ul>
+<p><strong>后面的几种思路都是看到文章提供的；</strong></p>
+<p><em>2、二分法思路</em></p>
+<p>从中间扔下去，若不碎，可以继续从第75层试…</p>
+<p>若碎了，回到方法一</p>
+<ul>
+<li><p>最好情况：2次</p>
+</li>
+<li><p>最坏情况：50次</p>
+</li>
+</ul>
+<p><em>3、均衡切割</em></p>
+<p>将100层切分成若干各区域，一颗鸡蛋用于确定区域，另一颗鸡蛋用于确定楼层；</p>
+<p>假若均分为10个区域，测试者从低往高，每10层扔一个鸡蛋，若鸡蛋破碎，则在该区域从低往高继续测试；</p>
+<ul>
+<li>最优：2次（NO.1）</li>
+<li>最坏：19次（NO.100）</li>
+</ul>
+<p><em>4、第三种思路的改良</em></p>
+<p>最终的测试次数，高楼层区域总是会比低楼层区域多，因为在定位区域时是从低往高测试，例：NO.18与NO.98层的测试次数。=&gt;区块完全均匀划分对大数不利。</p>
+<p>解决：低楼层区域，楼层范围扩大；高楼层区域所含楼层减少。用第二颗鸡蛋尝试次数的减少来弥补第一颗鸡蛋需要尝试次数的递增。</p>
+<p>每上一个区域，第一颗鸡蛋消耗的次数+1，因此可以让每个区块包含的楼层数逐级-1；</p>
+<p>若第一区域有n层，则第二区域有n-1层……第n个区域1层</p>
+<p>n+(n-1)+(n-2)+…+4+3+2+1&gt;=100</p>
+<p>得n最小值是14，测试总次数不会超过14次。</p>
+<hr>
+<p>当然，以上只是数学思维，不考虑实际。这里也只是记录一下我看到的算法题。悄咪咪看了评论还是有好多方法，瞄到有位大哥认为二分法更容易；因为之前备研有准备过数据结构这门课，感觉这里的解决思路倒是比较像查找那一章：顺序查找，二分查找……忽然间有感而发，原来之前一直在学习的知识会在某个地方会运用到，果然还是要多学习。</p>
+<p><strong>二、安装Linux系统</strong></p>
+<p>准备工作大概一个星期，浏览如何在自己的老电脑上安装双系统，如何分区比较好，跑去各个网站看视频看博客，最后决定将Linux系统安装在移动固态硬盘，因为老电脑的硬盘是HDD，再分一些空间给Linux的话，大概会卡到运行不了。Linux多个发行版本，权衡之下选择Ubuntu。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">--硬件清单</span><br><span class="line">-cpu Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz</span><br><span class="line">-RAM 4G+8G</span><br><span class="line">-type 64位</span><br><span class="line">-ssd samsung portable ssd T5 500G</span><br><span class="line">-空u盘 32G</span><br><span class="line"></span><br><span class="line">--软件清单</span><br><span class="line">- rufus-3.17</span><br><span class="line">- ubuntu-18.04.6-desktop-amd64.iso</span><br></pre></td></tr></table></figure>
+
+<p>硬件其实只需准备一个移动SSD+U盘，软件准备Ubuntu镜像文件和rufus；SSD将分配240G给Linux。</p>
+<p><em>1、下载所需的软件</em></p>
+<p>U盘一定是空的！而且是FAT32！然后rufus将Ubuntu镜像文件录入u盘中即可；</p>
+<p><em>2、ssd分区</em></p>
+<p>因为是新买的ssd，所以刚打开时就是一个主分区，当时还迷惑为什么不能压缩卷……后来参考了许多文章，原来要先删除卷，再新建。先给Ubuntu的240G分一个区，剩下的再分一个区；再将Ubuntu那个区删了，使之变成未分配的状态（不删的话等着重新登回window再分区吧，别问我为什么，因为鄙人就这么踩坑了，导致后面更多bug了，本来老电脑的window就慢了）。</p>
+<p><em>3、安装Ubuntu</em></p>
+<p>同时插入U盘和移动ssd，关闭电脑-&gt;重新开机-&gt;进入BIOS系统（我的是惠普电脑，疯狂按F10）-&gt;修改启动选项顺序，u盘或硬盘在前-&gt;进入Ubuntu安装引导页面啦！</p>
+<p>安装的教程很多，自行查看就可以了；注意分区的时候选择自定义，别选默认或者抹除（如果你打算只装一个Linux的话可以这么选）；</p>
+<p>我的分区（记不清了，好像是这样的）：</p>
+<ul>
+<li>efi 逻辑分区 400M</li>
+<li>/swap 逻辑分区 12G （因为我的内存是12G）</li>
+<li>/   ext4 主分区 100G</li>
+<li>/home ext4 主分区 剩下的都是它的</li>
+</ul>
+<p>然后等待一段时间就安装完成了，重新启动即可；</p>
+<p>注意重新启动的时候要拔掉U盘，然后将Ubuntu引导程序设为window的前面；</p>
+<p><em>4、安装过程中的坑</em></p>
+<p>（1）ssd分区后，分给Linux的忘记将它变回未分配状态，导致在安装Linux时，又要中断安装打开window操作。</p>
+<p>（2）重新分区后，再次重新安装，启动电脑出现新的问题：</p>
+<p><img src="../images/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/%E5%9D%911-1641053396447.png" alt="坑1"></p>
+<p>大概是找不到目录下的这个文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--解决方法</span><br><span class="line">将启动U盘中 /EFI/BOOT/gxxx.EFI（名字我忘了，g开头的）改为mmx64.EFI即可</span><br></pre></td></tr></table></figure>
+
+<p>（3）解决完坑2后，又有新的问题出现：</p>
+<p><img src="../images/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/%E5%9D%912.png" alt="坑2"></p>
+<p>？？？？无效签名？需要加载内核？之前不是才可以吗？忽然间想起之前学过的操作系统这门课，访问内核好像是需要安全权限的，猜测是这个原因。上网一搜，让我关掉安全模式，记得安装完后重新开回安全模式；</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--解决方法</span><br><span class="line">进入BIOS禁用安全模式即可</span><br></pre></td></tr></table></figure>
+
+<p>(4)系统已经成功安装完了，也可以正常用了；但我拔掉ssd后，重新开机，出现新问题，连window都开不了了！</p>
+<p><img src="../images/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/%E5%9D%913.png" alt="坑3"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--解决方法</span><br><span class="line">将window引导程序设回在Ubuntu前面，或者插回ssd，Ubuntu引导程序中选择window登录</span><br></pre></td></tr></table></figure>
+
+<p>出现这种情况的原因是：我的Ubuntu引导程序是安装在ssd中，然后现在拔掉了，启动顺序又是Ubuntu先，自然就会出现这样的问题。</p>
+<p><strong>小结</strong></p>
+<p>因为基本上是第一次操作Linux系统，基本小白一个，连中文输入法都安装不了…捣鼓着就3点了，再看了会手机，好家伙4点了。只能第二天起床再捣鼓，成功弄了中文输入法，也安装了科学上网的软件，打算再学一下shell命令等再将开发编辑器下载到系统中；使用感受：果然固态硬盘还是快，不知道是因为硬盘的原因还是系统的原因，连科学上网的速度都快了。好的，新年礼物收到了！新年快乐哦~又新的一天了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+	
+	
+		  
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2021/12/18/%E4%B8%80%E5%91%A8%E5%B0%8F%E7%BB%9320211213-20211219/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -478,12 +621,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -510,7 +653,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
