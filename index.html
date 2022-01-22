@@ -146,6 +146,90 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/01/22/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%9320220101-20220122/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/01/22/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%9320220101-20220122/" class="post-title-link" itemprop="url">三周总结20220101-20220122</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-01-22 20:34:02 / 修改时间：23:14:06" itemprop="dateCreated datePublished" datetime="2022-01-22T20:34:02+08:00">2022-01-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>前言：好久没写总结了，距离上次写竟然20天了；因为前半段时间都在做着非开发的事情，但偶尔会兼顾一下开发，遇到的问题其实一直都有做记录的，只是没时间总结在一起而已！！因为转换成Ubuntu了，所以新系统又要重新下载很多很多东西，比如说git，npm，node，java jdk和jre等等，今天一整个下午都在弄这个，还是很不熟悉文件系统，总是会思考代码工作目录应该放在哪个目录呢，会不会全部系统默认安装导致类似的window那样c盘爆满（linux是文件系统哦，好像也不会出现这么尴尬的事情，额好吧还是不太清楚）</p>
+<p><strong>一、关于使用HashMap无法获取值为null的字段</strong></p>
+<p>后端开发（Springboot，mybatis），在编写xml文件时，返回的类型是HashMap，但是数据库中有存在null值的字段，导致返回的结果没有该字段。</p>
+<p>解决方法：配置application.properties文件中添加该行即可</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mybatis.configuration.call-setters-on-nulls</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>二、mybatis sql语句写错出现的bug</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">org.springframework.jdbc.BadSqlGrammarException:</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## Error updating database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#x27;values</span></span></span><br><span class="line">        (&#x27;xxx&#x27;,&#x27;xxxx&#x27;,&#x27;xxx&#x27;,xxx.&#x27; at line 5</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## The error may exist in file xxxxxx</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## The error may involve xxxxx.addCollectionMapper-Inline</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## The error occurred while setting parameters</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## SQL: insert into performance_collection  (xxxx) values   (xxxxx);</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#x27;values</span></span></span><br><span class="line">        (&#x27;xxx&#x27;,&#x27;xxxx&#x27;,&#x27;xxx&#x27;,xxx.&#x27; at line 5</span><br><span class="line">; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#x27;values</span><br><span class="line">        (&#x27;xxx&#x27;,&#x27;xxxx&#x27;,&#x27;xxx&#x27;,xxx.&#x27; at line 5</span><br><span class="line"></span><br><span class="line">    at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:239)</span><br><span class="line">    at</span><br><span class="line">    ....</span><br></pre></td></tr></table></figure>
+
+<p><em>原因：</em> 就是xml文件中的sql语句写错了，要很细心去看！！我这里就是少了一个括号，吐血！</p>
+<p><strong>三、mybatis中sql语句动态注入</strong></p>
+<p>场景：我有四个表的结构是一模一样的，只是因为业务原因需要将数据分开存储，但是在编写xml中不想写四次语句，这样子的代码不利于复用，上网找了很久的解决方法，参考了这篇文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_46660780/article/details/109176066">mybatis插入动态表名_MrYshen的博客-CSDN博客_mybatis 动态插入表</a></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;xxx&quot;</span> <span class="attr">parameterTypes</span>=<span class="string">&quot;java.lang.String&quot;</span></span></span><br><span class="line"><span class="tag"><span class="attr">insert</span> <span class="attr">into</span> $&#123;广义表名&#125; () <span class="attr">values</span> ()</span></span><br><span class="line"><span class="tag">&lt;/<span class="attr">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>广义表名就是通过外部传入值，但是${}这种方式好像是不安全的，还有待考究！</p>
+<p>四、关于出现Raw use of parameterized class ‘HashMap’的问题</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> Inspection info: Reports any uses of parameterized classes where the type parameters are omitted. Such raw uses of parameterized types are valid in Java, but defeat the purpose of using type parameters, and may mask bugs. This inspection mirrors the rawtypes warning of javac.</span><br></pre></td></tr></table></figure>
+
+<p>情景：返回类型是List&lt; HashMap &gt;时出现的警告，&lt;&gt;里面是泛型，故不能这么写，改为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;HashMap&lt;String,Object&gt;&gt; getList();</span><br></pre></td></tr></table></figure>
+
+<p>最后唠嗑一下，这篇文章是使用Markext的软件来写的，还是不太熟悉配置，还是全英文唉。以上的都是最近在做接口开发时遇到的小问题，虽然问题不大，但当写代码写到头晕眼花时，这些还挺让人心烦的啧，希望过年前可以搞定。吐槽一下，为什么Linux向日葵不能复制粘贴啊！！有毒！下次有空的话打算看看能不能添加一个评论功能。</p>
+<p>有什么错误或问题可以邮箱联系: <a href="mailto:&#x6d;&#x69;&#117;&#x63;&#x75;&#110;&#108;&#x65;&#101;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#x6f;&#109;">&#x6d;&#x69;&#117;&#x63;&#x75;&#110;&#108;&#x65;&#101;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+	
+	
+	
+		  
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2021/12/27/%E4%B8%A4%E5%91%A8%E5%B0%8F%E6%80%BB%E7%BB%9320211220-20211231/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -361,7 +445,7 @@
 
 <p>经测试，木有问题。</p>
 <p><strong>一周小结：</strong>这一周花了些时间在excel处理中还有其他的事情中，所以写代码的时间少了，总结暂时到此，若明天周日还有，将继续补充。</p>
-<p>有什么错误或问题可以邮箱联系: <a href="mailto:&#109;&#105;&#117;&#99;&#117;&#x6e;&#x6c;&#x65;&#101;&#64;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#109;">&#109;&#105;&#117;&#99;&#117;&#x6e;&#x6c;&#x65;&#101;&#64;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#109;</a></p>
+<p>有什么错误或问题可以邮箱联系: <a href="mailto:&#109;&#105;&#x75;&#x63;&#117;&#110;&#108;&#x65;&#101;&#x40;&#x67;&#109;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;">&#109;&#105;&#x75;&#x63;&#117;&#110;&#108;&#x65;&#101;&#x40;&#x67;&#109;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;</a></p>
 
       
     </div>
@@ -474,7 +558,7 @@
 <p><em>2、StringOf()</em></p>
 <p>​    会将null转为字符串的“null”！！！！</p>
 <p><strong>以上就是本周的小结，好像还有一些忘记了，果然有什么要总结的，要及时记录</strong></p>
-<p>有什么错误或问题可以邮箱联系: <a href="mailto:&#109;&#105;&#117;&#99;&#117;&#x6e;&#108;&#x65;&#101;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;">&#109;&#105;&#117;&#99;&#117;&#x6e;&#108;&#x65;&#101;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>有什么错误或问题可以邮箱联系: <a href="mailto:&#x6d;&#105;&#x75;&#x63;&#x75;&#x6e;&#x6c;&#x65;&#x65;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x6d;&#105;&#x75;&#x63;&#x75;&#x6e;&#x6c;&#x65;&#x65;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></p>
 
       
     </div>
@@ -554,7 +638,6 @@
   
 
 	
-	
 
   
 
@@ -621,12 +704,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
