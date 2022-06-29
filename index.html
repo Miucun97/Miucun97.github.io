@@ -146,6 +146,408 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/" class="post-title-link" itemprop="url">记阿里云服务器被植入恶意脚本</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 22:10:13" itemprop="dateCreated datePublished" datetime="2022-06-07T22:10:13+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-29 22:19:16" itemprop="dateModified" datetime="2022-06-29T22:19:16+08:00">2022-06-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="记阿里云服务器被植入恶意脚本"><a href="#记阿里云服务器被植入恶意脚本" class="headerlink" title="记阿里云服务器被植入恶意脚本"></a>记阿里云服务器被植入恶意脚本</h1><p>前言：前段时间，小菜鸟面试了深圳的一家公司，里面有个职务要求就是熟悉在阿里云服务器(Linux)中部署项目。平时在公司是部署在window的服务器中，而且是自家的服务器，一切配置都已被安装好，安全方面是安装了360安全卫士。本人使用服务器就是将项目运行在服务器中，简而言之就是傻瓜式操作。稍微了解了一下行业，大多数企业都采用云服务器部署项目，于是抱着学习的状态，在阿里云申请免费使用一个月的服务器。</p>
+<blockquote>
+<p>服务器配置</p>
+</blockquote>
+<ul>
+<li><p>1核2G CentOS操作系统</p>
+</li>
+<li><p>没有其他任何安全类软件（穷）</p>
+</li>
+<li><p>试用阶段，在服务器安装配置了Redis，没有设置密码（是的，就是它搞事情：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg4MjYzMjI1MA==&mid=2247524077&idx=3&sn=81491af64c009cdbb18446ba955efc01&chksm=cf516db8f826e4ae0f392a1a5abcdd1a4f0bd9504cd5aa82e4c1adf574f951a5b3eedfeeb7a6&scene=126&&sessionid=0">CPU被挖矿，Redis竟是内鬼！</a>）</p>
+</li>
+</ul>
+<blockquote>
+<p>事件缘由</p>
+</blockquote>
+<p>某一天中午，阿里云发短信给我：出现紧急安全事件，恶意脚本代码执行。当时大中午的就没管，还觉得我这么菜的配置谁会整我，打算下午上班再弄。结果上班一看：sun！cpu使用率100%？？中午吃饭没关Redis服务就忽然间百分百？</p>
+<p>立马回想起安全报警，根据新手的第六感：不会中病毒了吧？？上网一搜，哦豁，其他人也试过这种情况，Delay no more（美丽的粤语），可能是被当肉鸡（被挖矿）或者门罗币…此时的我还置于震惊的状态：不是吧？我只是个小菜鸡，为啥要这么对我？ 好吧，代码无差别攻击。</p>
+<p><img src="/images/assets/2022-06-15-09-24-33-image.png" alt="图1"></p>
+<blockquote>
+<p>处理</p>
+</blockquote>
+<p>一开始查到的方法都是 <code>top</code>查出谁在占用cpu，然后<code>kill</code>进程即可。哇，好简单！然后使用<code>top</code>时，并没有出现网友们查出的那种情况，是的，全部cpu使用率都很正常，没有特别高…好郁闷</p>
+<p>方法二：用<code>pstree</code>也可以查出来哦！emmm,经实践：同样没有出现理想情况。</p>
+<p>无奈，寻求阿里云客服，客服给出的答复是：</p>
+<p><img src="/images/assets/2022-06-15-09-29-37-7bcc67580253f6880f77976aee16cc5.png" alt="图2"></p>
+<p>虽然我是新手，但我也想学习呀~想了想，算了，我自己解决。于是开始了面向搜索引擎查找解决方法。一切那么凑巧，我找了一篇类似的：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/373738540">阿里云服务器发现挖矿病毒(crypto和pnscan)导致CPU占用100%问题解决方案(超详细</a></p>
+<p>这篇文章帮了我挺多，根据步骤做，的确发现系统上存在一个<em>pnscan</em>文件夹，在进程中看到有不正常的<em>crypto</em>，但是没找到它在哪个位置。</p>
+<p>阅读了很多篇博客，也大概猜测出来服务器遭受攻击的原因了，就是利用了Reids的一些漏洞，Redis服务暴露在公网中且没有添加密码，刚好本初学者就完美踩坑了！</p>
+<p>*<em>开始处理</em>***：</p>
+<ul>
+<li><p>删除ssh密钥文件 </p>
+<ul>
+<li><p>文件在<code>/root/.ssh/</code>目录下，果然发现了<code>authority_keys</code>的文件，哈哈小样，删除嘛！我会！<code>rm -rf</code>就可以啦！哈哈，果然没这么简单呢~不允许被删除，话不多说，继续找</p>
+</li>
+<li><p>原来是被设置了隐藏文件属性不给删啊，使用<code>lsattr</code>就可以查看当前文件的属性</p>
+<p><img src="/images/assets/2022-06-15-09-44-12-image.png" alt="图3"></p>
+<p>果不其然，查到文件有a、i属性：</p>
+<p>            <img src="/images/assets/2022-06-15-09-45-09-image.png" alt="图4">            </p>
+<p>简单嘛，博客上说用<code>chattr</code>就可以啦~~是啊，果不其然用不了呢！！SUN！竟然对这个命令动了手脚！！<code>Permission denied</code></p>
+</li>
+</ul>
+</li>
+<li><p>功夫不负有心人，感谢踩坑的前人们：<a target="_blank" rel="noopener" href="https://blog.csdn.net/luoxiping1/article/details/118216787">bash: /usr/bin/chattr: Permission denied解决办法_luoxiping1的博客-CSDN博客</a>，</p>
+</li>
+<li><p>去除文件隐藏属性</p>
+<ul>
+<li><pre><code class="bash">chattr -属性 文件名
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>终于成功删除<code>authority_keys</code>这个文件啦！！！！</p>
+</li>
+<li><p>根据第二步杀进程</p>
+<ul>
+<li><p>跟着教程走就对了，删不了的就去除属性再删</p>
+</li>
+<li><p>pnscan：<code>/usr/local/bin</code>，crypto的我没有找到它的文件</p>
+</li>
+<li><p>虽然但是，使用top还是没查出来谁占用这么多啊！！总之，把这里的文件删了就对了，然后redis的配置文件修改：<code>bind 0.0.0.0</code>改回<code>bind 127.0.0.1</code>（因为要暴露出去，所以当时这样设置了），kill了redis进程</p>
+</li>
+<li><p>后面发现和教程不一样了，就没按照它的做法了，就只是先这么删了</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>cpu使用率回到0.3%！可喜可贺！太好了！立马给redis设密码！为了测试是否安全了，重新有开启redis服务（配置文件0.0.0.0又改回去了），很好，运行半小时，没问题，成功!<del>完结撒花！</del></p>
+<blockquote>
+<p>惊喜再现     </p>
+</blockquote>
+<p>我就知道没这么容易，第二天早上趁着闲暇，打开了控制台，SUN！100%CPU使用率！这次云哥没给我报警啊！脑子里忽然想起昨天浏览过的博客，似乎有出现那么一句话：<code>定时任务</code></p>
+<p>感动，又找到一篇博客：<a target="_blank" rel="noopener" href="https://blog.csdn.net/mdzz14/article/details/111656726">记一次CentOS7因Redis配置不当导致被Root提权沦为矿机修复过程_往事如烟隔多年的博客-CSDN博客</a>，看完这篇也是受益匪浅！</p>
+<ul>
+<li><p>使用<code>crontab -l</code>查看定时任务，好家伙，发现了一个奇怪的的文件</p>
+<p><img src="/images/assets/2022-06-15-10-07-27-image.png" alt="图5"></p>
+<p>打开一看，脚本，经学习，大概就是如何通过redis漏洞，往我的服务器中添加公钥，修改文件隐藏属性，植入定时任务等…（我的redis服务使用root用户开启的，所以就导致了这些问题），期间我还看到了一个ip地址：195.242.111.238（德国），但猜测也是假的</p>
+</li>
+<li><p>一回生二回熟，这次解决起来就轻车熟路了些，因为我的<code>top</code>命令暂时不起作用，所以我就换了顺序处理</p>
+</li>
+<li><p>处理</p>
+<ul>
+<li><p>删除定时任务：<code>crontab -r</code>。是的，又是权限不够呢~删除<code>/var/spool/cron/root</code>文件，不够权限就修改隐藏属性，<code>chattr</code>用不了，就按照前面说的去改一改就可以了，删除完毕后就可以删除定时任务了。</p>
+</li>
+<li><p>删除公钥(<code>/root/.ssh/</code>)</p>
+</li>
+<li><p><code>/etc/</code>目录下，继续删除<code>cron.*</code>脚本[<code>ls -l |grep cron</code>]，挖矿配置文件<code>zzh</code>、<code>zzhs</code>（教程说还有<code>config.json</code>，<code>newsvc.sh</code>，我木有这两个）</p>
+</li>
+<li><p><code>/tmp/</code>目录下，清理缓存文件</p>
+</li>
+<li><p>删除<code>pnscan</code>文件(<code>/usr/local/bin/</code>)，<code>crypto</code>我木有</p>
+</li>
+<li><p><code>top</code>：可以用了，终于看到真面目！占用了99.5%的内存的恶人！可惜没截图啊啊啊啊啊！</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/CleverCode/article/details/45421925">Linux根据进程号查看进程位置_程序员大宝(coder-dabao)的博客-CSDN博客_linux根据进程号查进程信息</a>，借助进程号，找到相关的位置，并删除对应文件（<code>cwd</code>和<code>exe</code>处），ps:原本将newinit.sh复制到自家电脑上的，但是被defender识别为有毒文件，自动清理了。</p>
+</li>
+<li><p><code>kill -9 进程号</code></p>
+</li>
+<li><p>配置阿里云安全组，恢复被修改的命令等</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>一切归于平静！我又新增了一个普通用户，用于启动redis服务，修改了redis的端口，ssh登录时遇到的新问题：<a target="_blank" rel="noopener" href="https://blog.csdn.net/aa19891204/article/details/106812459?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-1-106812459-blog-123200169.pc_relevant_aa&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-1-106812459-blog-123200169.pc_relevant_aa&utm_relevant_index=2">linux上添加新的用户，并赋予ssh登录权限_哈哈，名字可以改的博客-CSDN博客_linux用户ssh权限设置</a>，root修改普通用户密码：<code>passwd 用户名</code>，Redis配置参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40907977/article/details/106207488?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-4-106207488-blog-111656726.pc_relevant_downloadblacklistv1&spm=1001.2101.3001.4242.3&utm_relevant_index=6">黑客攻防Redis拉锯战之Root提权_寰宇001的博客-CSDN博客_redis 提权</a></p>
+<p>重新开启Redis服务，跑了16个小时，也就是我在写这篇记录时，暂时都还没出现问题。</p>
+<blockquote>
+<p>总结</p>
+</blockquote>
+<ul>
+<li><p>安全意识时时有，常在心中；因为不同于以往的本机开发，服务器ip地址暴露在公网中</p>
+</li>
+<li><p>Redis配置需谨慎，暴露端口提供服务时注意安全</p>
+</li>
+<li><p>多熟悉Linux命令；幸好这次没有把<code>cp</code>,<code>chmod</code>,<code>mv</code>等命令给黑了，不然真的会笑。</p>
+</li>
+<li><p>学习root与普通用户权限分配，文件权限分配等</p>
+</li>
+<li><p>遇到恶意脚本不慌，喝杯茶再找大佬（开个玩笑），学会自己分析，从进程-&gt;定时任务-&gt;…</p>
+</li>
+</ul>
+<p>解决完后又浏览到和我差不多情况的：<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_64355285/article/details/122217328">一次Linux中的木马病毒解决经历_普通网友的博客-CSDN博客_linux木马</a></p>
+<p>有问题可联系: <a href="mailto:miucunlee@gmail.com">miucunlee@gmail.com</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+	
+	
+		  
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">关于flowable springboot的使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-28 22:10:13" itemprop="dateCreated datePublished" datetime="2022-04-28T22:10:13+08:00">2022-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-29 22:21:46" itemprop="dateModified" datetime="2022-06-29T22:21:46+08:00">2022-06-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="关于flowable-springboot的简单使用"><a href="#关于flowable-springboot的简单使用" class="headerlink" title="关于flowable+springboot的简单使用"></a>关于flowable+springboot的简单使用</h1><h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>    什么是flowable？简单来说就是流程控制引擎，可以帮我们解决繁琐的流程控制，常用于OA系统。简单使用方法就是，我们画一个流程图，当图中某个业务完成时，flowable能根据我们写好的代码逻辑将流程跳到下一个业务中。如果想详细了解flowable，建议通过搜索引擎去学习。</p>
+<p>    选用flowable缘由，因工作原因需要完成公司OA系统的一个模块，第一版本没有使用任何工作流，全靠自己编写代码进行控制，每执行完业务流程后，都需要再编写流程控制代码，非常地繁琐。恰巧需求大改，于是我又重新推翻第一版本进行全新的开发，从入门到基本流程开发完成花了大约两到三个星期，但是不巧，需求又有改动，于是现在正进行第三版本的开发。另外一个原因：flowable是基于activiti进行开发的，换句话说flowable就是activiti的新版本，GitHub中也有在更新。但是找到的学习视频基本上都是activiti的，不过两者相差不大，可以参考activiti的视频进行入门（这里安利一下小破站的黑马程序员的activiti视频），当然可以结合flowable文档一起查看。</p>
+<h2 id="二、准备工作"><a href="#二、准备工作" class="headerlink" title="二、准备工作"></a>二、准备工作</h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> 开发工具：IntelliJ IDEA、SQLyog</span><br><span class="line"><span class="bullet">-</span> 版本：flowable v6.3.0、springboot v2.5.11-SNAPSHOT</span><br></pre></td></tr></table></figure>
+
+<h3 id="1、springboot的准备"><a href="#1、springboot的准备" class="headerlink" title="1、springboot的准备"></a>1、springboot的准备</h3><p>    首先是先新建工程，我是使用Spring Initializr生成的工程，sdk是1.8，依赖引入勾选（Web、JDBC、MySQL、MyBatis）</p>
+<p><img src="/images/assets/b4778eb3da7d05c6670c9e82c7d5dcd7fd4076ab.png" alt="图1"></p>
+<p><img src="/images/assets/8fef19fa642e59a68e6ca64101aa3253d22f37ef.png" alt="图2"></p>
+<h3 id="2、连接数据库"><a href="#2、连接数据库" class="headerlink" title="2、连接数据库"></a>2、连接数据库</h3><p>    在application.properties文件中写入：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#databaseName:数据库名,username和password就是你连接的数据库账号和密码</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/databaseName?useUnicode=true&amp;characterEncoding=utf-8</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">username</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">password</span></span><br></pre></td></tr></table></figure>
+
+<p>    接好后，可以自己编写个mapper（dao）来测试一下；对了，这里提一嘴，我使用的是MySQL，引擎是InnoDB。</p>
+<h3 id="3、flowable依赖引入"><a href="#3、flowable依赖引入" class="headerlink" title="3、flowable依赖引入"></a>3、flowable依赖引入</h3><p>在pom.xml文件中引入依赖，我使用的是v6.3.0版本</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--flowable依赖 v6.3.0版本--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.flowable<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flowable-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>6.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>引入后，启动一下工程，也就是有@SpringBootApplication的那个类，按理说没意外的话，打开你的数据库，会发现生成很多很多以act_开头的表，网上说生成二十几个表，但我生成了60+个表，emmm，是我打开的方式不对嘛..</p>
+<p><img src="/images/assets/63dba0ee3cd356bfea5f41ea87713215bcd8da1f.png" alt="图3"></p>
+<p>可能一下子看到这么多的表会很慌，但其实有规律可循，比如</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> act<span class="emphasis">_hi_</span><span class="emphasis">*: 中间是_hi_的，就是history的意思，一般用于存放历史数据。比如历史任务；</span></span><br><span class="line"><span class="emphasis">- act_ru_*</span>: 中间是<span class="emphasis">_ru_</span>的，是runtime的意思，一般用于存放运行中的数据，比如目前需要的变量等。</span><br><span class="line"><span class="bullet">-</span> 还有其他好多好多，但比较常用的就是这两个表，可以参考文档。</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、流程引入"><a href="#4、流程引入" class="headerlink" title="4、流程引入"></a>4、流程引入</h3><p>    若想我们的流程走起来，那肯定需要引入你的流程吧！若是以springboot的方式使用flowable的话，我们只需要将流程图（bpmn20）的xml文件放入resources目录下的processes目录中，没有该目录可以自己手动新建。然后重启一下程序，springboot就会自动帮我们将流程图以某种方式存进数据库中（表act_ge_bytearray、act_re_procdef可以看到）。</p>
+<p><img src="/images/assets/5dc1450da7f2016d7ce2582865a21c0ac9f7995c.png" alt="图4"></p>
+<ul>
+<li>流程图采用什么工具？<ul>
+<li>processOn、在线生成流程图网站、flowable modeler等</li>
+</ul>
+</li>
+</ul>
+<p>我使用的是flowable modeler，也就是flowable自带的工具。需要下载并部署到你电脑的tomcat中，故下面提一嘴如何安装和使用，本人踩坑多次，到现在依旧很迷惑。</p>
+<p><strong>flowable modeler</strong></p>
+<ul>
+<li><p>下载和安装</p>
+<ul>
+<li><p>网址：<a target="_blank" rel="noopener" href="https://github.com/flowable/flowable-engine/releases">https://github.com/flowable/flowable-engine/releases</a></p>
+</li>
+<li><p>我选择的是6.3.0版本，选择第一个zip下载</p>
+<p><img src="/images/assets/9fb1300e8f02ca4bd6da0dff842bd70fdebe9ce9.png" alt="图5"></p>
+</li>
+</ul>
+</li>
+<li><p>解压，进入wars目录，会发现里面有如下几个war文件</p>
+<p> <img src="/images/assets/213eb2b75843171fd00345a59d7b5e926ec492ca.png" alt="图6"></p>
+</li>
+<li><p>将这几个war文件复制并粘贴到你的tomcat的webapps目录下，再启动你的tomcat<br>tips：tomcat是你的安装目录，自己找找，如何启动tomcat，一般情况下打开命令行提示符，输入startup.bat就可启动，或者自己进入bin目录启动</p>
+</li>
+<li><p>启动后你会发现webapps目录下，多了5个war对应的文件夹</p>
+<p><img src="/images/assets/e6dbfc1c8ef1859d57880aa30994a9f76c9806bc.png" alt="图7"></p>
+</li>
+<li><p>这个时候，没意外的话，在浏览器输入<a href="">http://localhost:8080/flowable-modele</a>r就会出现下面的界面，账号admin密码test</p>
+</li>
+<li><p><img src="/images/assets/55e93c7be27e5cffd0013272fc1902a0d17b4071.png" alt="图8"></p>
+</li>
+</ul>
+<p>                登录后：            <img src="/images/assets/8eed4da64744eeeb2c823d3e281c3aa6e7aa5f2b.png" alt="图9"></p>
+<ul>
+<li><p>创建流程图</p>
+<ul>
+<li><p>点击蓝色按钮：Create Process 进入新界面，按照需求填入名称和key（key代表你这个流程的名字，在数据库中比较重要）<br><img src="/images/assets/36b9dae5143b1538d46996cc767e72fd91f164c8.png" alt="图10"></p>
+</li>
+<li><p>Create new model进入新界面<br><img src="/images/assets/6a32d1f483890af19e98d6547dca127638a28b19.png" alt="图11"></p>
+</li>
+<li><p>画图</p>
+<ul>
+<li><p>你需要一些流程图的知识，我这边建议你是看视频教程，因为我这个是简易使用，不详细说了。</p>
+</li>
+<li><p>常用组件：并行网关、usertask等</p>
+</li>
+<li><p>画完控件后，需要设置每个组件的一些属性，比如说这个usertask的id，assignments等</p>
+</li>
+<li><p>最后左上角保存</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>下载流程图</p>
+<ul>
+<li><p>在主页面，点击进入刚刚画好的图</p>
+</li>
+<li><p>右上角有个下载按钮，下载即可<br><img src="/images/assets/729201fefc1dfc63c60d3bd60894dd4b4709563f.png" alt="图12"></p>
+</li>
+<li><p>将下载好的xml文件放入工程resources目录下的processes目录中，重启工程即可</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="5、启动流程和创建流程实例"><a href="#5、启动流程和创建流程实例" class="headerlink" title="5、启动流程和创建流程实例"></a>5、启动流程和创建流程实例</h3><p>    当你看到表act_ge_bytearray、act_re_procdef可以看到你流程图的key，则证明流程图已经存入数据库中，接下来就是启动流程了。</p>
+<p>    这里我们需要了解的知识是：流程定义、流程实例、任务……举个例子，我们正在开发绩效申请，那绩效申请就是一个流程定义（顾名思义：定义一个流程，这流程里面有多个步骤，比如提出申请、审批等）；当不同员工去申请绩效，那一个员工申请就是一个流程实例；当我们启动了这个流程实例，我们的流程开始走下去了，比如说到了申请这一步，那此时就是一个任务task，申请后需要审批，则审批这个也是一个task；</p>
+<p>    用数量关系来形容就是：一个流程定义可以有多个流程实例，一个流程实例可以有多个任务。</p>
+<ul>
+<li><p>在测试用例中，创建流程实例</p>
+<ul>
+<li><p>```java<br>//process与流程有关<br>@Autowired<br>RuntimeService runtimeService;</p>
+<p>@Test<br>void test(){</p>
+<pre><code>ProcessInstance processInstance=runtimeService.startProcessInstanceId(&quot;这里是流程定义的key值，也就是画图中提到的key&quot;);
+if(processInstance!=null)&#123;
+    System.out.println(&quot;流程实例id：&quot;+processInstance.getProcessInstanceId());
+&#125;
+</code></pre>
+<p>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line">  - 如果上述有打印出来，则说明创建成功</span><br><span class="line"></span><br><span class="line">- 查看待办任务</span><br><span class="line">  </span><br><span class="line">  - ```java</span><br><span class="line">    //查看运行任务使用TaskService </span><br><span class="line">    //instanceId就是上面的流程实例id</span><br><span class="line">    @Autowired</span><br><span class="line">    TaskService taskService;</span><br><span class="line">    </span><br><span class="line">    void test1(String instanceId)&#123;</span><br><span class="line">        List&lt;Task&gt; tasks=taskService.createTaskQuery()</span><br><span class="line">                    .processInstanceId(instanceId)</span><br><span class="line">                    .list();</span><br><span class="line">    </span><br><span class="line">        for(task:tasks)&#123;</span><br><span class="line">            System.out.println(task.getId());</span><br><span class="line">            System.out.println(task.getName());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>正常情况下，可以打印出taskId和name；我个人就是将这个taskId和instanceId与业务流程结合。</p>
+</li>
+</ul>
+</li>
+<li><p>完成任务</p>
+<ul>
+<li>```java<br>@Autowired<br>TaskService taskService;void test2(String taskId){<pre><code>Task task = taskService.createTaskQuery()
+            .taskId(taskId)
+            .singleResult();
+if (task!=null)&#123;
+    taskService.complete(taskId);
+&#125;
+</code></pre>
+}<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 完成任务后，此时再调用一次test1，会发现待办任务不一样，可以理解为员工提交申请绩效，现在流程进入下一步了。</span><br><span class="line"></span><br><span class="line">- 驳回任务</span><br><span class="line">  </span><br><span class="line">  - 正常的业务场景中，我们知道如果审批不通过，就会被驳回，这个时候我们就要控制流程回到某一步。</span><br><span class="line">  </span><br><span class="line">  - 但流程多种多样，有并行的，也有串行的，所以使用的方法也是不一样的。</span><br><span class="line">    </span><br><span class="line">    ![图13](/images/assets/906ee21fef33f3e0b551b3805a605135049ebbfe.png)</span><br><span class="line">    </span><br><span class="line">    - D-&gt;B：</span><br><span class="line">      </span><br><span class="line">      - 这种是最简单的，key值一般可以在你的流程图里看到</span><br><span class="line">      </span><br><span class="line">      - ```java</span><br><span class="line">        //processInstanceId：流程实例id，taskDefinitionKey:D流程的id，goalKey：目的流程的id，也就是B的id</span><br><span class="line">        runtimeService.createChangeActivityStateBuilder()</span><br><span class="line">                        .processInstanceId(processInstanceId)</span><br><span class="line">                        .moveActivityIdTo(taskDefinitionKey,goalKey)</span><br><span class="line">                        .changeState();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>C-&gt;A（并行分支回到A）或者E-&gt;B、C：<ul>
+<li><p>退回到并行网关，先获取当前正在运行的执行任务id，注意：execution和一般的task是不一样的</p>
+</li>
+<li><pre><code class="java">//获取当前正在的执行任务列表，注意目的流程id（E-&gt;B、C）是第一个并行网关的id
+List&lt;Execution&gt; list = runtimeService.createExecutionQuery()
+                .parentId(proInstanceId)
+                .list();
+
+        List&lt;String&gt; list1 = new ArrayList&lt;&gt;();
+        for (Execution execution : list) &#123;
+            System.out.println(&quot;当前运行的任务key：&quot;+execution.getActivityId());
+            System.out.println(&quot;当前任务id：&quot;+execution.getId());
+            list1.add(execution.getId());
+        &#125;
+
+        //当前执行任务回到某个步骤
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(proInstanceId)
+                .moveExecutionsToSingleActivityId(list1,&quot;目的流程id&quot;)
+                .changeState();
+</code></pre>
+</li>
+<li><p>为什么要选用execution？因为并行流程中，退回是需要两条分线的最新流程id同时退回到目的key处，假设任务C完成后，当前task列表不存在C了，只有正在运行的B或D，如果要返回至A，但无法获取C的流程id，这样就无法正常退回到A，就算退回成功了，也可能是出错的。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="6、总结"><a href="#6、总结" class="headerlink" title="6、总结"></a>6、总结</h3><p>    以上是springboot+flowable的简单使用，其实踩了非常多的坑，有空再记录一下这些坑，还有分配任务负责人也是很常用的一个功能！还有好多flowable的功能还没挖掘，现在也只是按需简单使用，比如说flowable是结合了spring security，说实话我到现在还是搞不懂它的原理，想想就头疼；视频里很多都是将如何使用它们，但其实你要做的是如何将flowable融入到你的工程中，配合你的业务流程一起使用，就好比 绩效申请中，经理审批通过，此时我们就会调用审批通过的接口，审批的接口调用业务层（serviceImpl）就要先写你的业务代码，然后再调用到flowable的流程控制，也就是完成了当前流程实例审批的这个任务。这也算是我自己摸索出来的，可能耦合度会高一点，希望后续可以找到开源项目的代码去研究。</p>
+<p>有问题可联系: <mark><a href="mailto:&#109;&#x69;&#117;&#x63;&#x75;&#110;&#x6c;&#x65;&#x65;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#109;&#x69;&#117;&#x63;&#x75;&#110;&#x6c;&#x65;&#x65;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></mark></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+	
+	
+		  
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/01/22/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%9320220101-20220122/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -727,12 +1129,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>

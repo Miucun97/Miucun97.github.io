@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"miucun97.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="关于flowable+springboot的简单使用一、引言    什么是flowable？简单来说就是流程控制引擎，可以帮我们解决繁琐的流程控制，常用于OA系统。简单使用方法就是，我们画一个流程图，当图中某个业务完成时，flowable能根据我们写好的代码逻辑将流程跳到下一个业务中。如果想详细了解flowable，建议通过搜索引擎去学习。     选用flowable缘由，因工作原因需要完成公司">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于flowable springboot的使用">
+<meta property="og:url" content="https://miucun97.github.io/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="Miucun&#39;s blog">
+<meta property="og:description" content="关于flowable+springboot的简单使用一、引言    什么是flowable？简单来说就是流程控制引擎，可以帮我们解决繁琐的流程控制，常用于OA系统。简单使用方法就是，我们画一个流程图，当图中某个业务完成时，flowable能根据我们写好的代码逻辑将流程跳到下一个业务中。如果想详细了解flowable，建议通过搜索引擎去学习。     选用flowable缘由，因工作原因需要完成公司">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/b4778eb3da7d05c6670c9e82c7d5dcd7fd4076ab.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/8fef19fa642e59a68e6ca64101aa3253d22f37ef.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/63dba0ee3cd356bfea5f41ea87713215bcd8da1f.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/5dc1450da7f2016d7ce2582865a21c0ac9f7995c.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/9fb1300e8f02ca4bd6da0dff842bd70fdebe9ce9.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/213eb2b75843171fd00345a59d7b5e926ec492ca.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/e6dbfc1c8ef1859d57880aa30994a9f76c9806bc.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/55e93c7be27e5cffd0013272fc1902a0d17b4071.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/8eed4da64744eeeb2c823d3e281c3aa6e7aa5f2b.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/36b9dae5143b1538d46996cc767e72fd91f164c8.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/6a32d1f483890af19e98d6547dca127638a28b19.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/729201fefc1dfc63c60d3bd60894dd4b4709563f.png">
+<meta property="article:published_time" content="2022-04-28T14:10:13.000Z">
+<meta property="article:modified_time" content="2022-06-29T14:21:46.002Z">
+<meta property="article:author" content="Miucun">
+<meta property="article:tag" content="springboot">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="flowable">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miucun97.github.io/images/assets/b4778eb3da7d05c6670c9e82c7d5dcd7fd4076ab.png">
+
+<link rel="canonical" href="https://miucun97.github.io/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>关于flowable springboot的使用 | Miucun's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Miucun's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于flowable springboot的使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-28 22:10:13" itemprop="dateCreated datePublished" datetime="2022-04-28T22:10:13+08:00">2022-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-29 22:21:46" itemprop="dateModified" datetime="2022-06-29T22:21:46+08:00">2022-06-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="关于flowable-springboot的简单使用"><a href="#关于flowable-springboot的简单使用" class="headerlink" title="关于flowable+springboot的简单使用"></a>关于flowable+springboot的简单使用</h1><h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>    什么是flowable？简单来说就是流程控制引擎，可以帮我们解决繁琐的流程控制，常用于OA系统。简单使用方法就是，我们画一个流程图，当图中某个业务完成时，flowable能根据我们写好的代码逻辑将流程跳到下一个业务中。如果想详细了解flowable，建议通过搜索引擎去学习。</p>
+<p>    选用flowable缘由，因工作原因需要完成公司OA系统的一个模块，第一版本没有使用任何工作流，全靠自己编写代码进行控制，每执行完业务流程后，都需要再编写流程控制代码，非常地繁琐。恰巧需求大改，于是我又重新推翻第一版本进行全新的开发，从入门到基本流程开发完成花了大约两到三个星期，但是不巧，需求又有改动，于是现在正进行第三版本的开发。另外一个原因：flowable是基于activiti进行开发的，换句话说flowable就是activiti的新版本，GitHub中也有在更新。但是找到的学习视频基本上都是activiti的，不过两者相差不大，可以参考activiti的视频进行入门（这里安利一下小破站的黑马程序员的activiti视频），当然可以结合flowable文档一起查看。</p>
+<h2 id="二、准备工作"><a href="#二、准备工作" class="headerlink" title="二、准备工作"></a>二、准备工作</h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> 开发工具：IntelliJ IDEA、SQLyog</span><br><span class="line"><span class="bullet">-</span> 版本：flowable v6.3.0、springboot v2.5.11-SNAPSHOT</span><br></pre></td></tr></table></figure>
+
+<h3 id="1、springboot的准备"><a href="#1、springboot的准备" class="headerlink" title="1、springboot的准备"></a>1、springboot的准备</h3><p>    首先是先新建工程，我是使用Spring Initializr生成的工程，sdk是1.8，依赖引入勾选（Web、JDBC、MySQL、MyBatis）</p>
+<p><img src="/images/assets/b4778eb3da7d05c6670c9e82c7d5dcd7fd4076ab.png" alt="图1"></p>
+<p><img src="/images/assets/8fef19fa642e59a68e6ca64101aa3253d22f37ef.png" alt="图2"></p>
+<h3 id="2、连接数据库"><a href="#2、连接数据库" class="headerlink" title="2、连接数据库"></a>2、连接数据库</h3><p>    在application.properties文件中写入：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#databaseName:数据库名,username和password就是你连接的数据库账号和密码</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/databaseName?useUnicode=true&amp;characterEncoding=utf-8</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">username</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">password</span></span><br></pre></td></tr></table></figure>
+
+<p>    接好后，可以自己编写个mapper（dao）来测试一下；对了，这里提一嘴，我使用的是MySQL，引擎是InnoDB。</p>
+<h3 id="3、flowable依赖引入"><a href="#3、flowable依赖引入" class="headerlink" title="3、flowable依赖引入"></a>3、flowable依赖引入</h3><p>在pom.xml文件中引入依赖，我使用的是v6.3.0版本</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--flowable依赖 v6.3.0版本--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.flowable<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flowable-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>6.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>引入后，启动一下工程，也就是有@SpringBootApplication的那个类，按理说没意外的话，打开你的数据库，会发现生成很多很多以act_开头的表，网上说生成二十几个表，但我生成了60+个表，emmm，是我打开的方式不对嘛..</p>
+<p><img src="/images/assets/63dba0ee3cd356bfea5f41ea87713215bcd8da1f.png" alt="图3"></p>
+<p>可能一下子看到这么多的表会很慌，但其实有规律可循，比如</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> act<span class="emphasis">_hi_</span><span class="emphasis">*: 中间是_hi_的，就是history的意思，一般用于存放历史数据。比如历史任务；</span></span><br><span class="line"><span class="emphasis">- act_ru_*</span>: 中间是<span class="emphasis">_ru_</span>的，是runtime的意思，一般用于存放运行中的数据，比如目前需要的变量等。</span><br><span class="line"><span class="bullet">-</span> 还有其他好多好多，但比较常用的就是这两个表，可以参考文档。</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、流程引入"><a href="#4、流程引入" class="headerlink" title="4、流程引入"></a>4、流程引入</h3><p>    若想我们的流程走起来，那肯定需要引入你的流程吧！若是以springboot的方式使用flowable的话，我们只需要将流程图（bpmn20）的xml文件放入resources目录下的processes目录中，没有该目录可以自己手动新建。然后重启一下程序，springboot就会自动帮我们将流程图以某种方式存进数据库中（表act_ge_bytearray、act_re_procdef可以看到）。</p>
+<p><img src="/images/assets/5dc1450da7f2016d7ce2582865a21c0ac9f7995c.png" alt="图4"></p>
+<ul>
+<li>流程图采用什么工具？<ul>
+<li>processOn、在线生成流程图网站、flowable modeler等</li>
+</ul>
+</li>
+</ul>
+<p>我使用的是flowable modeler，也就是flowable自带的工具。需要下载并部署到你电脑的tomcat中，故下面提一嘴如何安装和使用，本人踩坑多次，到现在依旧很迷惑。</p>
+<p><strong>flowable modeler</strong></p>
+<ul>
+<li><p>下载和安装</p>
+<ul>
+<li><p>网址：<a target="_blank" rel="noopener" href="https://github.com/flowable/flowable-engine/releases">https://github.com/flowable/flowable-engine/releases</a></p>
+</li>
+<li><p>我选择的是6.3.0版本，选择第一个zip下载</p>
+<p><img src="/images/assets/9fb1300e8f02ca4bd6da0dff842bd70fdebe9ce9.png" alt="图5"></p>
+</li>
+</ul>
+</li>
+<li><p>解压，进入wars目录，会发现里面有如下几个war文件</p>
+<p> <img src="/images/assets/213eb2b75843171fd00345a59d7b5e926ec492ca.png" alt="图6"></p>
+</li>
+<li><p>将这几个war文件复制并粘贴到你的tomcat的webapps目录下，再启动你的tomcat<br>tips：tomcat是你的安装目录，自己找找，如何启动tomcat，一般情况下打开命令行提示符，输入startup.bat就可启动，或者自己进入bin目录启动</p>
+</li>
+<li><p>启动后你会发现webapps目录下，多了5个war对应的文件夹</p>
+<p><img src="/images/assets/e6dbfc1c8ef1859d57880aa30994a9f76c9806bc.png" alt="图7"></p>
+</li>
+<li><p>这个时候，没意外的话，在浏览器输入<a href="">http://localhost:8080/flowable-modele</a>r就会出现下面的界面，账号admin密码test</p>
+</li>
+<li><p><img src="/images/assets/55e93c7be27e5cffd0013272fc1902a0d17b4071.png" alt="图8"></p>
+</li>
+</ul>
+<p>                登录后：            <img src="/images/assets/8eed4da64744eeeb2c823d3e281c3aa6e7aa5f2b.png" alt="图9"></p>
+<ul>
+<li><p>创建流程图</p>
+<ul>
+<li><p>点击蓝色按钮：Create Process 进入新界面，按照需求填入名称和key（key代表你这个流程的名字，在数据库中比较重要）<br><img src="/images/assets/36b9dae5143b1538d46996cc767e72fd91f164c8.png" alt="图10"></p>
+</li>
+<li><p>Create new model进入新界面<br><img src="/images/assets/6a32d1f483890af19e98d6547dca127638a28b19.png" alt="图11"></p>
+</li>
+<li><p>画图</p>
+<ul>
+<li><p>你需要一些流程图的知识，我这边建议你是看视频教程，因为我这个是简易使用，不详细说了。</p>
+</li>
+<li><p>常用组件：并行网关、usertask等</p>
+</li>
+<li><p>画完控件后，需要设置每个组件的一些属性，比如说这个usertask的id，assignments等</p>
+</li>
+<li><p>最后左上角保存</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>下载流程图</p>
+<ul>
+<li><p>在主页面，点击进入刚刚画好的图</p>
+</li>
+<li><p>右上角有个下载按钮，下载即可<br><img src="/images/assets/729201fefc1dfc63c60d3bd60894dd4b4709563f.png" alt="图12"></p>
+</li>
+<li><p>将下载好的xml文件放入工程resources目录下的processes目录中，重启工程即可</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="5、启动流程和创建流程实例"><a href="#5、启动流程和创建流程实例" class="headerlink" title="5、启动流程和创建流程实例"></a>5、启动流程和创建流程实例</h3><p>    当你看到表act_ge_bytearray、act_re_procdef可以看到你流程图的key，则证明流程图已经存入数据库中，接下来就是启动流程了。</p>
+<p>    这里我们需要了解的知识是：流程定义、流程实例、任务……举个例子，我们正在开发绩效申请，那绩效申请就是一个流程定义（顾名思义：定义一个流程，这流程里面有多个步骤，比如提出申请、审批等）；当不同员工去申请绩效，那一个员工申请就是一个流程实例；当我们启动了这个流程实例，我们的流程开始走下去了，比如说到了申请这一步，那此时就是一个任务task，申请后需要审批，则审批这个也是一个task；</p>
+<p>    用数量关系来形容就是：一个流程定义可以有多个流程实例，一个流程实例可以有多个任务。</p>
+<ul>
+<li><p>在测试用例中，创建流程实例</p>
+<ul>
+<li><p>```java<br>//process与流程有关<br>@Autowired<br>RuntimeService runtimeService;</p>
+<p>@Test<br>void test(){</p>
+<pre><code>ProcessInstance processInstance=runtimeService.startProcessInstanceId(&quot;这里是流程定义的key值，也就是画图中提到的key&quot;);
+if(processInstance!=null)&#123;
+    System.out.println(&quot;流程实例id：&quot;+processInstance.getProcessInstanceId());
+&#125;
+</code></pre>
+<p>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line">  - 如果上述有打印出来，则说明创建成功</span><br><span class="line"></span><br><span class="line">- 查看待办任务</span><br><span class="line">  </span><br><span class="line">  - ```java</span><br><span class="line">    //查看运行任务使用TaskService </span><br><span class="line">    //instanceId就是上面的流程实例id</span><br><span class="line">    @Autowired</span><br><span class="line">    TaskService taskService;</span><br><span class="line">    </span><br><span class="line">    void test1(String instanceId)&#123;</span><br><span class="line">        List&lt;Task&gt; tasks=taskService.createTaskQuery()</span><br><span class="line">                    .processInstanceId(instanceId)</span><br><span class="line">                    .list();</span><br><span class="line">    </span><br><span class="line">        for(task:tasks)&#123;</span><br><span class="line">            System.out.println(task.getId());</span><br><span class="line">            System.out.println(task.getName());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>正常情况下，可以打印出taskId和name；我个人就是将这个taskId和instanceId与业务流程结合。</p>
+</li>
+</ul>
+</li>
+<li><p>完成任务</p>
+<ul>
+<li>```java<br>@Autowired<br>TaskService taskService;void test2(String taskId){<pre><code>Task task = taskService.createTaskQuery()
+            .taskId(taskId)
+            .singleResult();
+if (task!=null)&#123;
+    taskService.complete(taskId);
+&#125;
+</code></pre>
+}<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 完成任务后，此时再调用一次test1，会发现待办任务不一样，可以理解为员工提交申请绩效，现在流程进入下一步了。</span><br><span class="line"></span><br><span class="line">- 驳回任务</span><br><span class="line">  </span><br><span class="line">  - 正常的业务场景中，我们知道如果审批不通过，就会被驳回，这个时候我们就要控制流程回到某一步。</span><br><span class="line">  </span><br><span class="line">  - 但流程多种多样，有并行的，也有串行的，所以使用的方法也是不一样的。</span><br><span class="line">    </span><br><span class="line">    ![图13](/images/assets/906ee21fef33f3e0b551b3805a605135049ebbfe.png)</span><br><span class="line">    </span><br><span class="line">    - D-&gt;B：</span><br><span class="line">      </span><br><span class="line">      - 这种是最简单的，key值一般可以在你的流程图里看到</span><br><span class="line">      </span><br><span class="line">      - ```java</span><br><span class="line">        //processInstanceId：流程实例id，taskDefinitionKey:D流程的id，goalKey：目的流程的id，也就是B的id</span><br><span class="line">        runtimeService.createChangeActivityStateBuilder()</span><br><span class="line">                        .processInstanceId(processInstanceId)</span><br><span class="line">                        .moveActivityIdTo(taskDefinitionKey,goalKey)</span><br><span class="line">                        .changeState();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>C-&gt;A（并行分支回到A）或者E-&gt;B、C：<ul>
+<li><p>退回到并行网关，先获取当前正在运行的执行任务id，注意：execution和一般的task是不一样的</p>
+</li>
+<li><pre><code class="java">//获取当前正在的执行任务列表，注意目的流程id（E-&gt;B、C）是第一个并行网关的id
+List&lt;Execution&gt; list = runtimeService.createExecutionQuery()
+                .parentId(proInstanceId)
+                .list();
+
+        List&lt;String&gt; list1 = new ArrayList&lt;&gt;();
+        for (Execution execution : list) &#123;
+            System.out.println(&quot;当前运行的任务key：&quot;+execution.getActivityId());
+            System.out.println(&quot;当前任务id：&quot;+execution.getId());
+            list1.add(execution.getId());
+        &#125;
+
+        //当前执行任务回到某个步骤
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(proInstanceId)
+                .moveExecutionsToSingleActivityId(list1,&quot;目的流程id&quot;)
+                .changeState();
+</code></pre>
+</li>
+<li><p>为什么要选用execution？因为并行流程中，退回是需要两条分线的最新流程id同时退回到目的key处，假设任务C完成后，当前task列表不存在C了，只有正在运行的B或D，如果要返回至A，但无法获取C的流程id，这样就无法正常退回到A，就算退回成功了，也可能是出错的。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="6、总结"><a href="#6、总结" class="headerlink" title="6、总结"></a>6、总结</h3><p>    以上是springboot+flowable的简单使用，其实踩了非常多的坑，有空再记录一下这些坑，还有分配任务负责人也是很常用的一个功能！还有好多flowable的功能还没挖掘，现在也只是按需简单使用，比如说flowable是结合了spring security，说实话我到现在还是搞不懂它的原理，想想就头疼；视频里很多都是将如何使用它们，但其实你要做的是如何将flowable融入到你的工程中，配合你的业务流程一起使用，就好比 绩效申请中，经理审批通过，此时我们就会调用审批通过的接口，审批的接口调用业务层（serviceImpl）就要先写你的业务代码，然后再调用到flowable的流程控制，也就是完成了当前流程实例审批的这个任务。这也算是我自己摸索出来的，可能耦合度会高一点，希望后续可以找到开源项目的代码去研究。</p>
+<p>有问题可联系: <mark><a href="mailto:&#109;&#x69;&#117;&#x63;&#x75;&#110;&#x6c;&#x65;&#x65;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#109;&#x69;&#117;&#x63;&#x75;&#110;&#x6c;&#x65;&#x65;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></mark></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/springboot/" rel="tag"># springboot</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/flowable/" rel="tag"># flowable</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/22/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%9320220101-20220122/" rel="prev" title="三周总结20220101-20220122">
+      <i class="fa fa-chevron-left"></i> 三周总结20220101-20220122
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/" rel="next" title="记阿里云服务器被植入恶意脚本">
+      记阿里云服务器被植入恶意脚本 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Eflowable-springboot%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">关于flowable+springboot的简单使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">一、引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">二、准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81springboot%E7%9A%84%E5%87%86%E5%A4%87"><span class="nav-number">1.2.1.</span> <span class="nav-text">1、springboot的准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">1.2.2.</span> <span class="nav-text">2、连接数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81flowable%E4%BE%9D%E8%B5%96%E5%BC%95%E5%85%A5"><span class="nav-number">1.2.3.</span> <span class="nav-text">3、flowable依赖引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E6%B5%81%E7%A8%8B%E5%BC%95%E5%85%A5"><span class="nav-number">1.2.4.</span> <span class="nav-text">4、流程引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%92%8C%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.2.5.</span> <span class="nav-text">5、启动流程和创建流程实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.6.</span> <span class="nav-text">6、总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Miucun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Miucun</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

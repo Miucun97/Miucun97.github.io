@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"miucun97.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记阿里云服务器被植入恶意脚本前言：前段时间，小菜鸟面试了深圳的一家公司，里面有个职务要求就是熟悉在阿里云服务器(Linux)中部署项目。平时在公司是部署在window的服务器中，而且是自家的服务器，一切配置都已被安装好，安全方面是安装了360安全卫士。本人使用服务器就是将项目运行在服务器中，简而言之就是傻瓜式操作。稍微了解了一下行业，大多数企业都采用云服务器部署项目，于是抱着学习的状态，在阿里云申">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记阿里云服务器被植入恶意脚本">
+<meta property="og:url" content="https://miucun97.github.io/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="Miucun&#39;s blog">
+<meta property="og:description" content="记阿里云服务器被植入恶意脚本前言：前段时间，小菜鸟面试了深圳的一家公司，里面有个职务要求就是熟悉在阿里云服务器(Linux)中部署项目。平时在公司是部署在window的服务器中，而且是自家的服务器，一切配置都已被安装好，安全方面是安装了360安全卫士。本人使用服务器就是将项目运行在服务器中，简而言之就是傻瓜式操作。稍微了解了一下行业，大多数企业都采用云服务器部署项目，于是抱着学习的状态，在阿里云申">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/2022-06-15-09-24-33-image.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/2022-06-15-09-29-37-7bcc67580253f6880f77976aee16cc5.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/2022-06-15-09-44-12-image.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/2022-06-15-09-45-09-image.png">
+<meta property="og:image" content="https://miucun97.github.io/images/assets/2022-06-15-10-07-27-image.png">
+<meta property="article:published_time" content="2022-06-07T14:10:13.000Z">
+<meta property="article:modified_time" content="2022-06-29T14:19:16.861Z">
+<meta property="article:author" content="Miucun">
+<meta property="article:tag" content="阿里云，恶意脚本，cpu爆满">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miucun97.github.io/images/assets/2022-06-15-09-24-33-image.png">
+
+<link rel="canonical" href="https://miucun97.github.io/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>记阿里云服务器被植入恶意脚本 | Miucun's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Miucun's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://miucun97.github.io/2022/06/07/%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Miucun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Miucun's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记阿里云服务器被植入恶意脚本
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 22:10:13" itemprop="dateCreated datePublished" datetime="2022-06-07T22:10:13+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-29 22:19:16" itemprop="dateModified" datetime="2022-06-29T22:19:16+08:00">2022-06-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="记阿里云服务器被植入恶意脚本"><a href="#记阿里云服务器被植入恶意脚本" class="headerlink" title="记阿里云服务器被植入恶意脚本"></a>记阿里云服务器被植入恶意脚本</h1><p>前言：前段时间，小菜鸟面试了深圳的一家公司，里面有个职务要求就是熟悉在阿里云服务器(Linux)中部署项目。平时在公司是部署在window的服务器中，而且是自家的服务器，一切配置都已被安装好，安全方面是安装了360安全卫士。本人使用服务器就是将项目运行在服务器中，简而言之就是傻瓜式操作。稍微了解了一下行业，大多数企业都采用云服务器部署项目，于是抱着学习的状态，在阿里云申请免费使用一个月的服务器。</p>
+<blockquote>
+<p>服务器配置</p>
+</blockquote>
+<ul>
+<li><p>1核2G CentOS操作系统</p>
+</li>
+<li><p>没有其他任何安全类软件（穷）</p>
+</li>
+<li><p>试用阶段，在服务器安装配置了Redis，没有设置密码（是的，就是它搞事情：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg4MjYzMjI1MA==&mid=2247524077&idx=3&sn=81491af64c009cdbb18446ba955efc01&chksm=cf516db8f826e4ae0f392a1a5abcdd1a4f0bd9504cd5aa82e4c1adf574f951a5b3eedfeeb7a6&scene=126&&sessionid=0">CPU被挖矿，Redis竟是内鬼！</a>）</p>
+</li>
+</ul>
+<blockquote>
+<p>事件缘由</p>
+</blockquote>
+<p>某一天中午，阿里云发短信给我：出现紧急安全事件，恶意脚本代码执行。当时大中午的就没管，还觉得我这么菜的配置谁会整我，打算下午上班再弄。结果上班一看：sun！cpu使用率100%？？中午吃饭没关Redis服务就忽然间百分百？</p>
+<p>立马回想起安全报警，根据新手的第六感：不会中病毒了吧？？上网一搜，哦豁，其他人也试过这种情况，Delay no more（美丽的粤语），可能是被当肉鸡（被挖矿）或者门罗币…此时的我还置于震惊的状态：不是吧？我只是个小菜鸡，为啥要这么对我？ 好吧，代码无差别攻击。</p>
+<p><img src="/images/assets/2022-06-15-09-24-33-image.png" alt="图1"></p>
+<blockquote>
+<p>处理</p>
+</blockquote>
+<p>一开始查到的方法都是 <code>top</code>查出谁在占用cpu，然后<code>kill</code>进程即可。哇，好简单！然后使用<code>top</code>时，并没有出现网友们查出的那种情况，是的，全部cpu使用率都很正常，没有特别高…好郁闷</p>
+<p>方法二：用<code>pstree</code>也可以查出来哦！emmm,经实践：同样没有出现理想情况。</p>
+<p>无奈，寻求阿里云客服，客服给出的答复是：</p>
+<p><img src="/images/assets/2022-06-15-09-29-37-7bcc67580253f6880f77976aee16cc5.png" alt="图2"></p>
+<p>虽然我是新手，但我也想学习呀~想了想，算了，我自己解决。于是开始了面向搜索引擎查找解决方法。一切那么凑巧，我找了一篇类似的：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/373738540">阿里云服务器发现挖矿病毒(crypto和pnscan)导致CPU占用100%问题解决方案(超详细</a></p>
+<p>这篇文章帮了我挺多，根据步骤做，的确发现系统上存在一个<em>pnscan</em>文件夹，在进程中看到有不正常的<em>crypto</em>，但是没找到它在哪个位置。</p>
+<p>阅读了很多篇博客，也大概猜测出来服务器遭受攻击的原因了，就是利用了Reids的一些漏洞，Redis服务暴露在公网中且没有添加密码，刚好本初学者就完美踩坑了！</p>
+<p>*<em>开始处理</em>***：</p>
+<ul>
+<li><p>删除ssh密钥文件 </p>
+<ul>
+<li><p>文件在<code>/root/.ssh/</code>目录下，果然发现了<code>authority_keys</code>的文件，哈哈小样，删除嘛！我会！<code>rm -rf</code>就可以啦！哈哈，果然没这么简单呢~不允许被删除，话不多说，继续找</p>
+</li>
+<li><p>原来是被设置了隐藏文件属性不给删啊，使用<code>lsattr</code>就可以查看当前文件的属性</p>
+<p><img src="/images/assets/2022-06-15-09-44-12-image.png" alt="图3"></p>
+<p>果不其然，查到文件有a、i属性：</p>
+<p>            <img src="/images/assets/2022-06-15-09-45-09-image.png" alt="图4">            </p>
+<p>简单嘛，博客上说用<code>chattr</code>就可以啦~~是啊，果不其然用不了呢！！SUN！竟然对这个命令动了手脚！！<code>Permission denied</code></p>
+</li>
+</ul>
+</li>
+<li><p>功夫不负有心人，感谢踩坑的前人们：<a target="_blank" rel="noopener" href="https://blog.csdn.net/luoxiping1/article/details/118216787">bash: /usr/bin/chattr: Permission denied解决办法_luoxiping1的博客-CSDN博客</a>，</p>
+</li>
+<li><p>去除文件隐藏属性</p>
+<ul>
+<li><pre><code class="bash">chattr -属性 文件名
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>终于成功删除<code>authority_keys</code>这个文件啦！！！！</p>
+</li>
+<li><p>根据第二步杀进程</p>
+<ul>
+<li><p>跟着教程走就对了，删不了的就去除属性再删</p>
+</li>
+<li><p>pnscan：<code>/usr/local/bin</code>，crypto的我没有找到它的文件</p>
+</li>
+<li><p>虽然但是，使用top还是没查出来谁占用这么多啊！！总之，把这里的文件删了就对了，然后redis的配置文件修改：<code>bind 0.0.0.0</code>改回<code>bind 127.0.0.1</code>（因为要暴露出去，所以当时这样设置了），kill了redis进程</p>
+</li>
+<li><p>后面发现和教程不一样了，就没按照它的做法了，就只是先这么删了</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>cpu使用率回到0.3%！可喜可贺！太好了！立马给redis设密码！为了测试是否安全了，重新有开启redis服务（配置文件0.0.0.0又改回去了），很好，运行半小时，没问题，成功!<del>完结撒花！</del></p>
+<blockquote>
+<p>惊喜再现     </p>
+</blockquote>
+<p>我就知道没这么容易，第二天早上趁着闲暇，打开了控制台，SUN！100%CPU使用率！这次云哥没给我报警啊！脑子里忽然想起昨天浏览过的博客，似乎有出现那么一句话：<code>定时任务</code></p>
+<p>感动，又找到一篇博客：<a target="_blank" rel="noopener" href="https://blog.csdn.net/mdzz14/article/details/111656726">记一次CentOS7因Redis配置不当导致被Root提权沦为矿机修复过程_往事如烟隔多年的博客-CSDN博客</a>，看完这篇也是受益匪浅！</p>
+<ul>
+<li><p>使用<code>crontab -l</code>查看定时任务，好家伙，发现了一个奇怪的的文件</p>
+<p><img src="/images/assets/2022-06-15-10-07-27-image.png" alt="图5"></p>
+<p>打开一看，脚本，经学习，大概就是如何通过redis漏洞，往我的服务器中添加公钥，修改文件隐藏属性，植入定时任务等…（我的redis服务使用root用户开启的，所以就导致了这些问题），期间我还看到了一个ip地址：195.242.111.238（德国），但猜测也是假的</p>
+</li>
+<li><p>一回生二回熟，这次解决起来就轻车熟路了些，因为我的<code>top</code>命令暂时不起作用，所以我就换了顺序处理</p>
+</li>
+<li><p>处理</p>
+<ul>
+<li><p>删除定时任务：<code>crontab -r</code>。是的，又是权限不够呢~删除<code>/var/spool/cron/root</code>文件，不够权限就修改隐藏属性，<code>chattr</code>用不了，就按照前面说的去改一改就可以了，删除完毕后就可以删除定时任务了。</p>
+</li>
+<li><p>删除公钥(<code>/root/.ssh/</code>)</p>
+</li>
+<li><p><code>/etc/</code>目录下，继续删除<code>cron.*</code>脚本[<code>ls -l |grep cron</code>]，挖矿配置文件<code>zzh</code>、<code>zzhs</code>（教程说还有<code>config.json</code>，<code>newsvc.sh</code>，我木有这两个）</p>
+</li>
+<li><p><code>/tmp/</code>目录下，清理缓存文件</p>
+</li>
+<li><p>删除<code>pnscan</code>文件(<code>/usr/local/bin/</code>)，<code>crypto</code>我木有</p>
+</li>
+<li><p><code>top</code>：可以用了，终于看到真面目！占用了99.5%的内存的恶人！可惜没截图啊啊啊啊啊！</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/CleverCode/article/details/45421925">Linux根据进程号查看进程位置_程序员大宝(coder-dabao)的博客-CSDN博客_linux根据进程号查进程信息</a>，借助进程号，找到相关的位置，并删除对应文件（<code>cwd</code>和<code>exe</code>处），ps:原本将newinit.sh复制到自家电脑上的，但是被defender识别为有毒文件，自动清理了。</p>
+</li>
+<li><p><code>kill -9 进程号</code></p>
+</li>
+<li><p>配置阿里云安全组，恢复被修改的命令等</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>一切归于平静！我又新增了一个普通用户，用于启动redis服务，修改了redis的端口，ssh登录时遇到的新问题：<a target="_blank" rel="noopener" href="https://blog.csdn.net/aa19891204/article/details/106812459?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-1-106812459-blog-123200169.pc_relevant_aa&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~default-1-106812459-blog-123200169.pc_relevant_aa&utm_relevant_index=2">linux上添加新的用户，并赋予ssh登录权限_哈哈，名字可以改的博客-CSDN博客_linux用户ssh权限设置</a>，root修改普通用户密码：<code>passwd 用户名</code>，Redis配置参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40907977/article/details/106207488?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-4-106207488-blog-111656726.pc_relevant_downloadblacklistv1&spm=1001.2101.3001.4242.3&utm_relevant_index=6">黑客攻防Redis拉锯战之Root提权_寰宇001的博客-CSDN博客_redis 提权</a></p>
+<p>重新开启Redis服务，跑了16个小时，也就是我在写这篇记录时，暂时都还没出现问题。</p>
+<blockquote>
+<p>总结</p>
+</blockquote>
+<ul>
+<li><p>安全意识时时有，常在心中；因为不同于以往的本机开发，服务器ip地址暴露在公网中</p>
+</li>
+<li><p>Redis配置需谨慎，暴露端口提供服务时注意安全</p>
+</li>
+<li><p>多熟悉Linux命令；幸好这次没有把<code>cp</code>,<code>chmod</code>,<code>mv</code>等命令给黑了，不然真的会笑。</p>
+</li>
+<li><p>学习root与普通用户权限分配，文件权限分配等</p>
+</li>
+<li><p>遇到恶意脚本不慌，喝杯茶再找大佬（开个玩笑），学会自己分析，从进程-&gt;定时任务-&gt;…</p>
+</li>
+</ul>
+<p>解决完后又浏览到和我差不多情况的：<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_64355285/article/details/122217328">一次Linux中的木马病毒解决经历_普通网友的博客-CSDN博客_linux木马</a></p>
+<p>有问题可联系: <a href="mailto:miucunlee@gmail.com">miucunlee@gmail.com</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91%EF%BC%8C%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC%EF%BC%8Ccpu%E7%88%86%E6%BB%A1/" rel="tag"># 阿里云，恶意脚本，cpu爆满</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/28/%E5%85%B3%E4%BA%8Eflowable%20springboot%E7%9A%84%E4%BD%BF%E7%94%A8/" rel="prev" title="关于flowable springboot的使用">
+      <i class="fa fa-chevron-left"></i> 关于flowable springboot的使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A2%AB%E6%A4%8D%E5%85%A5%E6%81%B6%E6%84%8F%E8%84%9A%E6%9C%AC"><span class="nav-number">1.</span> <span class="nav-text">记阿里云服务器被植入恶意脚本</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Miucun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Miucun</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
